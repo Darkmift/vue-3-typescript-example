@@ -1,5 +1,5 @@
 import Tutorial from "../types/Tutorial";
-import * as utils from "../utils/uuid";
+import { uuidv4 } from "../utils/uuidv4";
 
 let tutorials: Tutorial[] = [];
 
@@ -14,7 +14,7 @@ class TutorialDataService {
   }
 
   create(data: Tutorial): Promise<any> {
-    data.id = utils.uuidv4();
+    data.id = uuidv4();
     tutorials.push(data);
     return Promise.resolve(tutorials.find((tutorial) => tutorial.id === data.id));
   }

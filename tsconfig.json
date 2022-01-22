@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "target": "esnext",
     "module": "esnext",
     "strict": true,
@@ -23,8 +22,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx",
-    "src/utils/uuid.js"
+    "tests/**/*.tsx"
   ],
   "exclude": ["node_modules", "dist"]//added dist due to some ts error...likely due to allowjs true
 }
