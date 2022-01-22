@@ -38,14 +38,13 @@
 import { defineComponent } from "vue";
 import TutorialDataService from "@/services/TutorialDataService";
 import Tutorial from "@/types/Tutorial";
-import ResponseData from "@/types/ResponseData";
 
 export default defineComponent({
   name: "add-tutorial",
   data() {
     return {
       tutorial: {
-        id: null,
+        id: "",
         title: "",
         description: "",
         published: false,
@@ -61,9 +60,9 @@ export default defineComponent({
       };
 
       TutorialDataService.create(data)
-        .then((response: ResponseData) => {
-          this.tutorial.id = response.data.id;
-          console.log(response.data);
+        .then((response: Tutorial) => {
+          this.tutorial.id = response.id;
+          console.log(response);
           this.submitted = true;
         })
         .catch((e: Error) => {

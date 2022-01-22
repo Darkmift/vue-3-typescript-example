@@ -70,7 +70,6 @@
 import { defineComponent } from "vue";
 import TutorialDataService from "@/services/TutorialDataService";
 import Tutorial from "@/types/Tutorial";
-import ResponseData from "@/types/ResponseData";
 
 export default defineComponent({
   name: "tutorials-list",
@@ -85,9 +84,9 @@ export default defineComponent({
   methods: {
     retrieveTutorials() {
       TutorialDataService.getAll()
-        .then((response: ResponseData) => {
-          this.tutorials = response.data;
-          console.log(response.data);
+        .then((value: Tutorial[]) => {
+          this.tutorials = value?.length ? value : [];
+          console.log(value);
         })
         .catch((e: Error) => {
           console.log(e);
@@ -107,8 +106,8 @@ export default defineComponent({
 
     removeAllTutorials() {
       TutorialDataService.deleteAll()
-        .then((response: ResponseData) => {
-          console.log(response.data);
+        .then((response: boolean) => {
+          console.log(response);
           this.refreshList();
         })
         .catch((e: Error) => {
@@ -118,10 +117,10 @@ export default defineComponent({
 
     searchTitle() {
       TutorialDataService.findByTitle(this.title)
-        .then((response: ResponseData) => {
-          this.tutorials = response.data;
+        .then((response: Tutorial[]) => {
+          this.tutorials = response;
           this.setActiveTutorial({} as Tutorial);
-          console.log(response.data);
+          console.log(response);
         })
         .catch((e: Error) => {
           console.log(e);

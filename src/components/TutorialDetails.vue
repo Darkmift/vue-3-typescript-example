@@ -1,7 +1,7 @@
 <template>
   <div v-if="currentTutorial.id" class="edit-form">
     <h4>Tutorial</h4>
-    <form>
+    <form v-if="currentTutorial">
       <div class="form-group">
         <label for="title">Title</label>
         <input
@@ -29,7 +29,7 @@
 
     <button
       class="badge badge-primary mr-2"
-      v-if="currentTutorial.published"
+      v-if="currentTutorial?.published"
       @click="updatePublished(false)"
     >
       UnPublish
@@ -62,22 +62,21 @@
 import { defineComponent } from "vue";
 import TutorialDataService from "@/services/TutorialDataService";
 import Tutorial from "@/types/Tutorial";
-import ResponseData from "@/types/ResponseData";
 
 export default defineComponent({
   name: "tutorial",
   data() {
     return {
-      currentTutorial: {} as Tutorial,
+      currentTutorial: {} as Tutorial | undefined,
       message: "",
     };
   },
   methods: {
-    getTutorial(id: any) {
+    getTutorial(id: string) {
       TutorialDataService.get(id)
-        .then((response: ResponseData) => {
-          this.currentTutorial = response.data;
-          console.log(response.data);
+        .then((response: Tutorial | undefined) => {
+          this.currentTutorial = response;
+          console.log(response);
         })
         .catch((e: Error) => {
           console.log(e);
@@ -85,6 +84,11 @@ export default defineComponent({
     },
 
     updatePublished(status: boolean) {
+      if (!this.currentTutorial?.id) {
+        console.log("no tutorial!");
+        return;
+      }
+
       let data = {
         id: this.currentTutorial.id,
         title: this.currentTutorial.title,
@@ -92,9 +96,12 @@ export default defineComponent({
         published: status,
       };
 
-      TutorialDataService.update(this.currentTutorial.id, data)
-        .then((response: ResponseData) => {
-          console.log(response.data);
+      TutorialDataService.update(this.currentTutorial.id || "", data)
+        .then((response: Tutorial | undefined) => {
+          console.log(response);
+          if (!this.currentTutorial) {
+            throw new Error("currentTutorial is not defined");
+          }
           this.currentTutorial.published = status;
           this.message = "The status was updated successfully!";
         })
@@ -104,9 +111,17 @@ export default defineComponent({
     },
 
     updateTutorial() {
-      TutorialDataService.update(this.currentTutorial.id, this.currentTutorial)
-        .then((response: ResponseData) => {
-          console.log(response.data);
+      if (!this.currentTutorial) {
+        console.log("currentTutorial is undefined");
+        return;
+      }
+
+      TutorialDataService.update(
+        this.currentTutorial.id || "",
+        this.currentTutorial
+      )
+        .then((response: Tutorial | undefined) => {
+          console.log(response);
           this.message = "The tutorial was updated successfully!";
         })
         .catch((e: Error) => {
@@ -115,9 +130,9 @@ export default defineComponent({
     },
 
     deleteTutorial() {
-      TutorialDataService.delete(this.currentTutorial.id)
-        .then((response: ResponseData) => {
-          console.log(response.data);
+      TutorialDataService.delete(this.currentTutorial?.id || "")
+        .then((response) => {
+          console.log(response);
           this.$router.push({ name: "tutorials" });
         })
         .catch((e: Error) => {
@@ -127,7 +142,8 @@ export default defineComponent({
   },
   mounted() {
     this.message = "";
-    this.getTutorial(this.$route.params.id);
+    if (this.$route.params.id && typeof this.$route.params.id === "string")
+      this.getTutorial(this.$route.params.id);
   },
 });
 </script>
